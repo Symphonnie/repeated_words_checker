@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Repeated Words Checker</title>
+
+  <style>
+    .highlight-1 { background-color: yellow; }
+    .highlight-2 { background-color: lightblue; }
+    .highlight-3 { background-color: lightgreen; }
+    .highlight-4 { background-color: pink; }
+    /* Add more highlight classes as needed */
+
+    #result {
+      width: 70%;
+      height: 200px;
+      overflow: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-top: 10px;
+      white-space: pre-line;
+    }
+
+    #repeatedWordsList {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Repeated Words Checker</h1>
+  <p>
+    <label for="input">Enter your article:</label><br>
+    <textarea id="input" rows="10" cols="50"></textarea><br><br>
+    <label for="minRepeat">Minimum repeated times:</label><br>
+    <input type="number" id="minRepeat" value="2" min="1">
+    <button onclick="highlightRepeatedWords()">Check</button><br><br>
+    <label for="result">Results:</label><br>
+    <div id="result"></div>
+    <div id="repeatedWordsList"></div>
+  </p>
+
+  <script>
+    function highlightRepeatedWords() {
+      // Get the user input and minimum repeated time
+      const article = document.getElementById('input').value;
+      const minRepeat = parseInt(document.getElementById('minRepeat').value);
+
+      // Split the article into paragraphs
+      const paragraphs = article.split('\n');
+
+      // Initialize word count object
+      const wordCount = {};
+
+      // Iterate through each paragraph
+      for (let i = 0; i < paragraphs.length; i++) {
+        const words = paragraphs[i].toLowerCase().match(/\b\w+\b/g) || []; // Extract words and convert to lowercase
+
+        // Count the occurrences of each word in the entire article
+        for (let j = 0; j < words.length; j++) {
+          const word = words[j];
+          wordCount[word] = (wordCount[word] || 0) + 1;
+        }
+      }
+
+      // Create a list of repeated words and their frequencies
+      const repeatedWordsList = Object.entries(wordCount)
+        .filter(([word, count]) => count >= minRepeat)
+        .map(([word, count]) => `${word}: ${count}`);
+
+      // Iterate through each paragraph again for highlighting
+      for (let i = 0; i < paragraphs.length; i++) {
+        const words = paragraphs[i].toLowerCase().match(/\b\w+\b/g) || []; // Extract words and convert to lowercase
+
+        // Highlight words that repeat at least minRepeat times
+        for (let j = 0; j < words.length; j++) {
+          const word = words[j];
+          const count = wordCount[word];
+          if (count >= minRepeat) {
+            const highlightClass = `highlight-${count}`;
+            const regex = new RegExp(`\\b${word}\\b`, 'gi');
+            paragraphs[i] = paragraphs[i].replace(regex, `<span class="${highlightClass}">${word}</span>`);
+          }
+        }
+      }
+
+      // Display the modified article and list of repeated words
+      document.getElementById('result').innerHTML = paragraphs.join("<br>");
+      document.getElementById('repeatedWordsList').innerHTML = `<b>Repeated Words List:</b><br>${repeatedWordsList.join('<br>')}`;
+    }
+  </script>
+
+</body>
+</html>
